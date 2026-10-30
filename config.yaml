@@ -1,0 +1,110 @@
+# В путях Windows используй / (C:/Sources/a.mp4) или одинарные кавычки.
+video_path: "C:/Sources/Streams/Stream.mp4"
+output_dir: "output"
+work_dir: "work"            # кэш аудио/расшифровки и .ass-файлы; можно чистить
+
+# --- чат (JSON из TwitchDownloader) ---
+chat_path: "C:/Sources/Chats/Chat.json"   # пусто "" = работать без чата
+# Время в видео = время в чате + chat_offset_sec.
+# Видео с самого начала трансляции: 0. Видео вырезано с секунды X: -X (например, -1800).
+chat_offset_sec: 0
+
+# --- сколько клипов ---
+clips_count: 8              # сколько клипов делать автоматически (если auto_top_n: true)
+candidates_count: 30        # сколько кандидатов попадёт в candidates.md
+auto_top_n: false           # false: клипы после выбора номеров (python main.py --pick 3,7,12)
+clip_min_sec: 20
+clip_max_sec: 60
+language: "ru"
+
+whisper_model: "large-v3"
+whisper_compute_type: "float16"
+whisper_fallback_model: "small"   # если GPU не заработает (CPU, int8)
+
+# --- раскладка 1080x1920 ---
+vertical_mode: "split"      # split | blur | crop
+
+# split: сверху вебкамера, снизу игра. Области: проценты кадра ("27.7%", не зависят от разрешения)
+# или пиксели исходного видео (число без кавычек).
+split_top_percent: 40       # высота верхней части, % от 1920
+webcam_region: {x: "0%", y: "45.4%", w: "27.7%", h: "27.6%"}
+game_region: {x: "28.1%", y: "0%", w: "52.7%", h: "100%"}   # null = весь кадр
+region_inset_px: 4          # срезать столько пикселей внутрь от границ каждой области
+webcam_fit: "crop"          # crop: верх заполняется целиком, обрезка по центру области
+                            # pad: ширина 1080, лишнее по высоте режется, пустое место - размытый фон
+game_fit: "crop"            # crop: низ заполняется целиком, обрезка по центру области
+                            # pad: игра целиком без обрезки, пустое место - размытый фон
+preview_time_sec: 60        # с какой секунды брать кадр для preview.png
+
+# --- субтитры ---
+subtitle_position: "boundary"     # boundary: на границе частей (только split) | bottom: внизу
+subtitle_margin_bottom: 420       # для bottom, blur и crop: отступ от низа кадра, px
+subtitle_font: "Arial"
+subtitle_font_size: 72
+
+# --- границы клипа и речь ---
+preroll_sec: 12             # сколько секунд до начала пика (причина момента)
+postroll_sec: 6             # сколько секунд после конца пика
+min_speech_coverage: 0.6    # доля речи в клипе; если меньше, кандидат заменяется следующим
+
+# --- веса сигналов отбора ---
+loudness_weight: 1.0
+speech_keyword_weight: 0.7        # ключевые слова в речи
+chat_spike_weight: 1.0            # всплеск частоты сообщений в чате
+chat_reaction_weight: 0.7         # слова-реакции в чате
+speech_coverage_weight: 0.0       # доля речи в клипе (0 = только как фильтр min_speech_coverage)
+
+# --- цикл оценок (python main.py --learn) ---
+ratings_path: "ratings.csv"                  # сюда пишутся клипы для оценки (0, 1 или 2)
+suggested_weights_path: "suggested_weights.yaml"
+learn_min_rated: 30         # сколько оценённых клипов с данными чата нужно для подбора весов
+
+# Ключевые слова в речи
+keywords:
+  - нифига
+  - нифига себе
+  - ничего себе
+  - жесть
+  - офигеть
+  - офигенно
+  - охренеть
+  - ахах
+  - хаха
+  - вау
+  - кринж
+  - угар
+  - красавчик
+  - да ладно
+  - не может быть
+  - как так
+  - что происходит
+  - серьезно
+  - пиздец
+  - капец
+  - блять
+  - бля
+  - сука
+  - нахер
+  - нахуй
+  - хуйня
+  - хуй
+  - ебан
+  - ебат
+  - заебись
+
+# Слова и эмоуты-реакции в чате (регистр не важен)
+chat_reaction_words:
+  - LUL
+  - PogChamp
+  - Kreygasm
+  - NotLikeThis
+  - WutFace
+  - бля
+  - ебать
+  - ахах
+  - хаха
+  - жесть
+  - пиздец
+
+llm:
+  enabled: false
