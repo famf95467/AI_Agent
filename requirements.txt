@@ -1,4 +1,0 @@
-faster-whisper
-PyYAML
-python-dotenv
-numpy
